@@ -1,0 +1,1387 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CPU Scheduling Calculator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: linear-gradient(135deg, #ffd6e7, #fff5f9);
+    background-attachment: fixed;
+    padding: max(clamp(10px, 3vw, 30px), env(safe-area-inset-top))
+             max(clamp(10px, 3vw, 30px), env(safe-area-inset-right))
+             max(clamp(10px, 3vw, 30px), env(safe-area-inset-bottom))
+             max(clamp(10px, 3vw, 30px), env(safe-area-inset-left));
+    color: #5a4050;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    background: white;
+    border: 4px solid #ff9fc4;
+    border-radius: clamp(18px, 3vw, 30px);
+    padding: clamp(14px, 3vw, 30px);
+    box-shadow: 0 10px 30px #ff69a040;
+}
+
+.header {
+    text-align: center;
+    background: #ffb6d5;
+    border-radius: clamp(16px, 2.5vw, 25px);
+    padding: clamp(14px, 3vw, 25px);
+    margin-bottom: clamp(15px, 2.5vw, 25px);
+    border: 3px solid #ff82b4;
+}
+
+.header h1 {
+    color: white;
+    font-size: clamp(20px, 5vw, 32px);
+    text-shadow: 2px 2px #e875a5;
+    overflow-wrap: anywhere;
+}
+
+.header p {
+    color: white;
+    margin-top: 8px;
+}
+
+.kitty {
+    font-size: clamp(40px, 9vw, 65px);
+    margin-bottom: 10px;
+}
+
+.section {
+    background: #fff7fb;
+    border: 2px solid #ffb4d2;
+    border-radius: 20px;
+    padding: clamp(12px, 2.5vw, 20px);
+    margin-bottom: clamp(14px, 2vw, 20px);
+}
+
+.section h2 {
+    color: #e85d96;
+    margin-bottom: 15px;
+    font-size: clamp(18px, 3.5vw, 24px);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+    color: #8c5270;
+}
+
+select, input {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px;
+    border: 2px solid #ffafd0;
+    border-radius: 12px;
+    outline: none;
+    background: white;
+    color: #5a4050;
+    font-size: 16px;
+}
+
+select:focus, input:focus {
+    border-color: #ff5f9e;
+    box-shadow: 0 0 0 3px #ff5f9e33;
+}
+
+input:disabled {
+    background: #f6ecf1;
+    color: #a58a98;
+}
+
+.algorithm-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.results-table {
+    min-width: 560px;
+}
+
+th {
+    background: #ff8fba;
+    color: white;
+    padding: 12px;
+    font-size: clamp(12px, 2.6vw, 16px);
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ffd4e5;
+    font-size: clamp(13px, 2.8vw, 16px);
+}
+
+tr:nth-child(even) {
+    background: #fff0f6;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+button {
+    border: none;
+    padding: 13px 30px;
+    min-height: 44px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.calculate {
+    background: #ff5f9e;
+    color: white;
+}
+
+.reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    background: #ffd1e3;
+    color: #7a4960;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 13px 30px;
+    border-radius: 20px;
+}
+
+.average-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.average {
+    background: #ffdfeb;
+    border: 2px solid #ff9fc4;
+    padding: 15px 30px;
+    border-radius: 18px;
+    text-align: center;
+    min-width: 140px;
+}
+
+.average strong {
+    display: block;
+    color: #e85d96;
+    margin-bottom: 5px;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #c05b86;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .container {
+        border-width: 3px;
+    }
+}
+
+@media (max-width: 700px) {
+    .algorithm-box {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .average-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    th, td {
+        padding: 8px 6px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .buttons .calculate,
+    .buttons .reset {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .container {
+        border-width: 2px;
+    }
+
+    .section {
+        padding: 10px;
+    }
+
+    input {
+        padding: 8px;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .kitty {
+        display: none;
+    }
+
+    .header {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+#bg3d {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    display: block;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>CPU SCHEDULING CALCULATOR</h1>
+    </div>
+
+    <div class="section">
+
+        <h2>Scheduling Algorithm</h2>
+
+        <div class="algorithm-box">
+
+            <div>
+                <label for="algorithm">Choose Algorithm</label>
+
+                <select id="algorithm">
+                    <option value="FCFS">
+                        First Come First Serve (FCFS)
+                    </option>
+
+                    <option value="SJF">
+                        Shortest Job First (SJF)
+                    </option>
+
+                    <option value="RR">
+                        Round Robin (RR)
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label for="quantum">Time Quantum</label>
+
+                <input
+                    type="number"
+                    id="quantum"
+                    inputmode="numeric"
+                    min="1"
+                    value="2"
+                    disabled
+                >
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Process Information</h2>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>P1</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="at1"
+                                inputmode="numeric"
+                                min="0"
+                                value="0"
+                                required
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="bt1"
+                                inputmode="numeric"
+                                min="1"
+                                value="5"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>P2</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="at2"
+                                inputmode="numeric"
+                                min="0"
+                                value="1"
+                                required
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="bt2"
+                                inputmode="numeric"
+                                min="1"
+                                value="3"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>P3</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="at3"
+                                inputmode="numeric"
+                                min="0"
+                                value="2"
+                                required
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="bt3"
+                                inputmode="numeric"
+                                min="1"
+                                value="8"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>P4</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="at4"
+                                inputmode="numeric"
+                                min="0"
+                                value="3"
+                                required
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="bt4"
+                                inputmode="numeric"
+                                min="1"
+                                value="6"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>P5</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="at5"
+                                inputmode="numeric"
+                                min="0"
+                                value="4"
+                                required
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                id="bt5"
+                                inputmode="numeric"
+                                min="1"
+                                value="4"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                class="calculate"
+                type="button"
+                id="calculateBtn"
+            >
+                CALCULATE
+            </button>
+
+            <button
+                class="reset"
+                type="button"
+                id="resetBtn"
+            >
+                ♡ RESET
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Results</h2>
+
+        <div class="table-wrap">
+
+            <table class="results-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                        <th>Completion Time</th>
+                        <th>Turnaround Time</th>
+                        <th>Waiting Time</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="resultsBody">
+
+                    <tr>
+                        <td colspan="6">
+                            Results will appear here ♡
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="average-box">
+
+            <div class="average">
+
+                <strong>Average TAT</strong>
+
+                <span id="avgTAT">
+                    0.00
+                </span>
+
+            </div>
+
+
+            <div class="average">
+
+                <strong>Average WT</strong>
+
+                <span id="avgWT">
+                    0.00
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const algorithm = document.getElementById("algorithm");
+const quantum = document.getElementById("quantum");
+const calculateBtn = document.getElementById("calculateBtn");
+const resetBtn = document.getElementById("resetBtn");
+const resultsBody = document.getElementById("resultsBody");
+const avgTAT = document.getElementById("avgTAT");
+const avgWT = document.getElementById("avgWT");
+
+
+algorithm.addEventListener("change", function() {
+
+    quantum.disabled = this.value !== "RR";
+
+});
+
+
+function getProcesses() {
+
+    const processes = [];
+
+    for (let i = 1; i <= 5; i++) {
+
+        const atInput = document.getElementById("at" + i);
+        const btInput = document.getElementById("bt" + i);
+
+        let at = parseInt(atInput.value);
+        let bt = parseInt(btInput.value);
+
+        if (isNaN(at) || at < 0) {
+            at = 0;
+            atInput.value = 0;
+        }
+
+        if (isNaN(bt) || bt < 1) {
+            bt = 1;
+            btInput.value = 1;
+        }
+
+        processes.push({
+            id: "P" + i,
+            at: at,
+            bt: bt,
+            remaining: bt,
+            ct: 0,
+            tat: 0,
+            wt: 0,
+            originalIndex: i
+        });
+    }
+
+    return processes;
+}
+
+
+function calculateFCFS(processes) {
+
+    processes.sort(function(a, b) {
+
+        if (a.at !== b.at) {
+            return a.at - b.at;
+        }
+
+        return a.originalIndex - b.originalIndex;
+
+    });
+
+
+    let time = 0;
+
+
+    for (let p of processes) {
+
+        time = Math.max(time, p.at);
+
+        time += p.bt;
+
+        p.ct = time;
+
+        p.tat = p.ct - p.at;
+
+        p.wt = p.tat - p.bt;
+
+    }
+
+
+    return processes;
+}
+
+
+function calculateSJF(processes) {
+
+    let time = 0;
+    let completed = 0;
+    const n = processes.length;
+
+    while (completed < n) {
+
+        let available = [];
+
+        for (let i = 0; i < processes.length; i++) {
+
+            const p = processes[i];
+
+            if (p.ct === 0 && p.at <= time) {
+                available.push(p);
+            }
+
+        }
+
+
+        if (available.length === 0) {
+
+            let nextArrival = Infinity;
+
+            for (let p of processes) {
+
+                if (p.ct === 0 && p.at < nextArrival) {
+                    nextArrival = p.at;
+                }
+
+            }
+
+            time = nextArrival;
+
+            continue;
+        }
+
+
+        available.sort(function(a, b) {
+
+            if (a.bt !== b.bt) {
+                return a.bt - b.bt;
+            }
+
+            if (a.at !== b.at) {
+                return a.at - b.at;
+            }
+
+            return a.originalIndex - b.originalIndex;
+
+        });
+
+
+        const p = available[0];
+
+        time += p.bt;
+
+        p.ct = time;
+
+        p.tat = p.ct - p.at;
+
+        p.wt = p.tat - p.bt;
+
+        completed++;
+
+    }
+
+
+    return processes;
+}
+
+
+function calculateRR(processes) {
+
+    let q = parseInt(quantum.value);
+
+    if (isNaN(q) || q <= 0) {
+
+        alert("Please enter a valid Time Quantum.");
+
+        return null;
+    }
+
+
+    processes.sort(function(a, b) {
+
+        if (a.at !== b.at) {
+            return a.at - b.at;
+        }
+
+        return a.originalIndex - b.originalIndex;
+
+    });
+
+
+    let time = 0;
+    let completed = 0;
+    let index = 0;
+    const n = processes.length;
+    const queue = [];
+
+
+    while (completed < n) {
+
+        while (
+            index < n &&
+            processes[index].at <= time
+        ) {
+
+            queue.push(index);
+            index++;
+
+        }
+
+
+        if (queue.length === 0) {
+
+            if (index < n) {
+
+                time = processes[index].at;
+
+            }
+
+            continue;
+        }
+
+
+        const currentIndex = queue.shift();
+
+        const p = processes[currentIndex];
+
+
+        const execution = Math.min(
+            q,
+            p.remaining
+        );
+
+
+        time += execution;
+
+        p.remaining -= execution;
+
+
+        while (
+            index < n &&
+            processes[index].at <= time
+        ) {
+
+            queue.push(index);
+            index++;
+
+        }
+
+
+        if (p.remaining > 0) {
+
+            queue.push(currentIndex);
+
+        } else {
+
+            p.ct = time;
+
+            p.tat = p.ct - p.at;
+
+            p.wt = p.tat - p.bt;
+
+            completed++;
+
+        }
+
+    }
+
+
+    return processes;
+}
+
+
+function displayResults(processes) {
+
+    processes.sort(function(a, b) {
+
+        return a.originalIndex - b.originalIndex;
+
+    });
+
+
+    resultsBody.innerHTML = "";
+
+
+    let totalTAT = 0;
+    let totalWT = 0;
+
+
+    for (let p of processes) {
+
+        totalTAT += p.tat;
+        totalWT += p.wt;
+
+
+        const row = document.createElement("tr");
+
+
+        row.innerHTML = `
+
+            <td>${p.id}</td>
+
+            <td>${p.at}</td>
+
+            <td>${p.bt}</td>
+
+            <td>${p.ct}</td>
+
+            <td>${p.tat}</td>
+
+            <td>${p.wt}</td>
+
+        `;
+
+
+        resultsBody.appendChild(row);
+
+    }
+
+
+    avgTAT.textContent =
+        (totalTAT / processes.length).toFixed(2);
+
+
+    avgWT.textContent =
+        (totalWT / processes.length).toFixed(2);
+
+}
+
+
+calculateBtn.addEventListener("click", function() {
+
+    let processes = getProcesses();
+
+    let selectedAlgorithm = algorithm.value;
+
+    let results;
+
+
+    if (selectedAlgorithm === "FCFS") {
+
+        results = calculateFCFS(processes);
+
+    }
+
+    else if (selectedAlgorithm === "SJF") {
+
+        results = calculateSJF(processes);
+
+    }
+
+    else if (selectedAlgorithm === "RR") {
+
+        results = calculateRR(processes);
+
+        if (results === null) {
+            return;
+        }
+
+    }
+
+
+    displayResults(results);
+
+});
+
+
+resetBtn.addEventListener("click", function() {
+
+    algorithm.value = "FCFS";
+
+    quantum.value = 2;
+
+    quantum.disabled = true;
+
+
+    const defaultAT = [0, 1, 2, 3, 4];
+    const defaultBT = [5, 3, 8, 6, 4];
+
+
+    for (let i = 1; i <= 5; i++) {
+
+        document.getElementById("at" + i).value =
+            defaultAT[i - 1];
+
+        document.getElementById("bt" + i).value =
+            defaultBT[i - 1];
+
+    }
+
+
+    resultsBody.innerHTML = `
+
+        <tr>
+            <td colspan="6">
+                Results will appear here ♡
+            </td>
+        </tr>
+
+    `;
+
+
+    avgTAT.textContent = "0.00";
+    avgWT.textContent = "0.00";
+
+});
+
+
+/* Pink floating hearts background */
+
+(function () {
+
+    const colors = [
+        '#ff9fc4',
+        '#ff82b4',
+        '#ffb6d5',
+        '#ff5f9e',
+        '#ffc2dc'
+    ];
+
+
+    const canvas = document.createElement('canvas');
+
+    canvas.id = 'bg3d';
+
+    document.body.prepend(canvas);
+
+
+    const ctx = canvas.getContext('2d');
+
+
+    let W;
+    let H;
+    let dpr;
+
+
+    function resize() {
+
+        dpr = Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+        W = window.innerWidth;
+        H = window.innerHeight;
+
+
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+
+
+        ctx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+    }
+
+
+    resize();
+
+
+    let resizeTimer;
+
+
+    function onResize() {
+
+        clearTimeout(resizeTimer);
+
+        resizeTimer = setTimeout(
+            resize,
+            120
+        );
+
+    }
+
+
+    window.addEventListener(
+        'resize',
+        onResize
+    );
+
+
+    window.addEventListener(
+        'orientationchange',
+        onResize
+    );
+
+
+    const N =
+        W < 500
+            ? 22
+            : W < 900
+                ? 36
+                : 60;
+
+
+    const items = [];
+
+
+    for (let i = 0; i < N; i++) {
+
+        items.push({
+
+            x: Math.random() * W,
+
+            y: Math.random() * H,
+
+            z: 0.2 + Math.random() * 0.8,
+
+            angle: Math.random() * Math.PI * 2,
+
+            spin:
+                Math.random() * 0.02 + 0.005,
+
+            phase:
+                Math.random() * 10,
+
+            color:
+                colors[i % colors.length]
+
+        });
+
+    }
+
+
+    items.sort(function(a, b) {
+
+        return a.z - b.z;
+
+    });
+
+
+    let tx = 0;
+    let ty = 0;
+    let cx = 0;
+    let cy = 0;
+
+
+    function clamp(v) {
+
+        return Math.max(
+            -1,
+            Math.min(1, v)
+        );
+
+    }
+
+
+    window.addEventListener(
+        'pointermove',
+        function(e) {
+
+            tx =
+                (e.clientX / W - 0.5) * 2;
+
+            ty =
+                (e.clientY / H - 0.5) * 2;
+
+        }
+    );
+
+
+    window.addEventListener(
+        'deviceorientation',
+        function(e) {
+
+            if (e.gamma != null) {
+
+                tx =
+                    clamp(e.gamma / 30);
+
+                ty =
+                    clamp(
+                        (e.beta - 45) / 30
+                    );
+
+            }
+
+        }
+    );
+
+
+    function heart(s) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            s * 0.35
+        );
+
+
+        ctx.bezierCurveTo(
+            -s,
+            -s * 0.3,
+            -s * 0.5,
+            -s * 0.9,
+            0,
+            -s * 0.4
+        );
+
+
+        ctx.bezierCurveTo(
+            s * 0.5,
+            -s * 0.9,
+            s,
+            -s * 0.3,
+            0,
+            s * 0.35
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    const reduce =
+        window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+
+    function scaleFor() {
+
+        if (W < 500) {
+            return 0.7;
+        }
+
+        if (W < 900) {
+            return 0.85;
+        }
+
+        return 1;
+
+    }
+
+
+    let running = true;
+
+
+    function frame(t) {
+
+        ctx.clearRect(
+            0,
+            0,
+            W,
+            H
+        );
+
+
+        cx += (tx - cx) * 0.06;
+
+        cy += (ty - cy) * 0.06;
+
+
+        const k = scaleFor();
+
+
+        for (const p of items) {
+
+            if (!reduce) {
+
+                p.y -=
+                    0.25 + p.z * 0.9;
+
+                p.angle += p.spin;
+
+            }
+
+
+            const size =
+                (8 + p.z * 26) * k;
+
+
+            if (p.y < -size * 2) {
+
+                p.y =
+                    H + size * 2;
+
+                p.x =
+                    Math.random() * W;
+
+            }
+
+
+            const sway =
+                Math.sin(
+                    t / 1200 + p.phase
+                ) *
+                14 *
+                p.z;
+
+
+            const px =
+                p.x +
+                sway +
+                cx * p.z * 45;
+
+
+            const py =
+                p.y +
+                cy * p.z * 45;
+
+
+            ctx.save();
+
+
+            ctx.translate(
+                px,
+                py
+            );
+
+
+            ctx.scale(
+                Math.cos(p.angle),
+                1
+            );
+
+
+            ctx.rotate(
+                Math.sin(
+                    t / 2000 + p.phase
+                ) * 0.3
+            );
+
+
+            ctx.globalAlpha =
+                0.25 + p.z * 0.45;
+
+
+            ctx.fillStyle =
+                p.color;
+
+
+            ctx.shadowColor =
+                p.color;
+
+
+            ctx.shadowBlur =
+                (1 - p.z) * 12;
+
+
+            heart(size);
+
+
+            ctx.restore();
+
+        }
+
+
+        if (!reduce && running) {
+
+            requestAnimationFrame(frame);
+
+        }
+
+    }
+
+
+    requestAnimationFrame(frame);
+
+
+    document.addEventListener(
+        'visibilitychange',
+        function() {
+
+            running =
+                !document.hidden;
+
+
+            if (
+                running &&
+                !reduce
+            ) {
+
+                requestAnimationFrame(frame);
+
+            }
+
+        }
+    );
+
+})();
+
+</script>
+
+</body>
+</html>
+```
